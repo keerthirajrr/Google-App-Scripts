@@ -1,0 +1,311 @@
+
+<head>
+    <base target="_top">
+      <style>
+          .container1 {
+        background-color: #bec0b0;
+        padding: 5px 20px 15px 20px;
+        border: 1px solid #3d6170;
+        border-radius: 3px;
+      }
+
+          *:focus{
+            outline:none;
+          }
+          
+          h4 {
+              color: black;
+          }
+
+          input {
+              color: black;
+          }
+
+          .dropbtn {
+              border-radius: 50px;
+              background-color: hsl(209, 77%, 76%);
+              color: black;
+
+              padding: 5px;
+              font-size: 14px;
+              border: none;
+          }
+
+
+          .dropdown {
+              position: relative;
+              display: inline-block;
+          }
+
+          .dropdown-content {
+              display: none;
+              position: absolute;
+              background-color: #f1f1f1;
+              min-width: 160px;
+              box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+              z-index: 1;
+          }
+
+          .dropdown-content a {
+              color: black;
+              padding: 12px 16px;
+              text-decoration: none;
+              display: block;
+          }
+          .errorMSG{
+            color: red; 
+            font-family: Courier New;
+          }
+          .navBtn {
+              background-color: hsl(209, 77%, 76%);
+              border-radius: 50px;
+          }
+
+          .dropdown-content a:hover {
+              background-color: #ddd;
+          }
+
+          .dropdown:hover .dropdown-content {
+              display: block;
+          }
+
+          .dropdown:hover .dropbtn {
+              background-color: rgb(255, 255, 255);
+              color: black;
+          }
+
+          input[type=text] {
+              border: none;
+              border-bottom: 2px solid rgb(0, 174, 255);
+              width: 100%;
+          }
+
+            input[type=file] {
+        background-color: #4d90fe;
+        color: white;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 17px;
+      }
+
+
+          .submitBtn {
+              border-radius: 50px;
+              background-color: #3d6170;
+              color: black;
+              padding: 10px;
+              /* padding-right: 10px;
+              padding-left: 10px; */
+              width: 100%;
+
+              font-size: 14px;
+              border: none;
+          }
+
+          .btn1 {
+    text-decoration: none;
+    float: right;
+    padding: 12px;
+    margin: 15px;
+    color: #cb1b1;
+    background-color: #3d6170;
+    transition: width .35s;
+    -webkit-transition: width .35s;
+    overflow: hidden
+  }
+
+
+          .submitBtn:hover {
+              background-color: rgb(255, 255, 255);
+              color: black;
+          }
+
+          .mainBox {
+
+        
+              margin: auto;
+              margin-top: 5%;
+              width: 32%;
+              border-radius: 24px;
+              background-color: rgb(255, 255, 255);
+              padding: 30px 86px;
+              padding-top: 36px;
+              border: 1px solid #3d6170;
+
+          }
+
+
+          #popinstructions,#popinstructions2{
+                position : fixed;
+                background: white;
+                top : 50%;
+                left : 50%;
+                transform: translate(-50%,-50%);
+                width : 600px;
+                padding: 50px;
+                box-shadow: 0 5px 30px rgba(0,0,0,.30); 
+                visibility: hidden;
+                opacity: 0;
+                transition: 0.5s;
+                border: 2px solid #3d6170;
+              }
+          #popinstructions.active,#popinstructions2.active{
+                top : 50%;
+                visibility: visible;
+                opacity : 1;
+                transition : 0.5s;
+              }
+
+          .mainBox.active{
+            filter: blur(20px);
+          }
+
+          #mytable {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  #mytable td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  #mytable tr:nth-child(even){background-color: #f2f2f2;}
+
+  #mytable tr:hover {background-color: #ddd;}
+
+  #mytable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #3d6170;
+    color: white;
+    height: 64px;
+  }
+      </style>
+    
+
+  <script>
+
+      function uploadData() {
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+         var c = document.getElementById('mainBox');
+            c.classList.toggle('active');
+            var pop = document.getElementById('popinstructions2');
+            pop.classList.toggle('active');
+        
+
+        reader.onload = function (e) {
+          const formData = e.target.result;
+          google.script.run.withSuccessHandler(showResultMessage).processExcelData(formData);
+          console.log("failure handler", err)
+          var c = document.getElementById('mainBox');
+            c.classList.toggle('active');
+            var pop = document.getElementById('popinstructions2');
+            pop.classList.toggle('active');
+        };
+
+        reader.readAsText(file);
+      }
+
+      function showResultMessage(response) {
+        const resultMessage = document.getElementById("resultMessage");
+        if (response === "Success") {
+          alert("Data uploaded successfully!");
+           var c = document.getElementById('mainBox');
+            c.classList.toggle('active');
+            var pop = document.getElementById('popinstructions2');
+            pop.classList.toggle('active');
+        } else if (response === "Failed") {
+          alert("Upload failed. Please check the file format and try again.");
+           var c = document.getElementById('mainBox');
+            c.classList.toggle('active');
+            var pop = document.getElementById('popinstructions2');
+            pop.classList.toggle('active');
+        } else {
+          alert("Unexpected error occurred during upload.");
+           var c = document.getElementById('mainBox');
+            c.classList.toggle('active');
+            var pop = document.getElementById('popinstructions2');
+            pop.classList.toggle('active');
+        }
+      }
+   
+
+      function pops() {
+        var c = document.getElementById('mainBox');
+        c.classList.toggle('active');
+        var pop = document.getElementById('popinstructions');
+        pop.classList.toggle('active');
+      }
+
+</script>
+</head>
+
+
+<body>
+    <div class="container1" style="padding-bottom: 50px;">
+      
+
+<table id="mytable">
+  <tr>
+    <th>Excel_Upload</th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+  <td> <p>Read the instructions <b style="cursor:pointer; text-decoration: underline;" onclick=pops()>here</b> carefully before making your submissions /// <b> Please allow 5 to 15 Minutes for the System to Upload the Data, Once the Upload is Over, It automatically Display the Status Message.<p></td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+   <tr>
+  <td>   <p style="font-size:smaller;"> Please make sure all the files are less than 50 MB in size.</p>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+ 
+</table>
+    <div class="mainBox" id="mainBox" style="
+    height: 280px;
+">
+       
+        <br>
+        <form>
+            <label style="color: #323538; font-family: CenturyGothic, AppleGothic, sans-serif;font-size: 24px;">File upload</label>
+            <br>
+            <input type="file" id="fileInput">
+            <br>
+            <br>
+            <input id="sbmt" class="submitBtn" type="button" value="Upload" onclick="uploadData()">
+        </form>
+    </div>
+    <div class="popinstructions", id="popinstructions">
+      <label style="color: #323538; font-family: CenturyGothic, AppleGothic, sans-serif;font-size: 24px;">Instructions</label>
+      <hr>
+      
+<table id="mytable">
+  <tr>
+    <th>-</th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+  <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+ 
+</table>
+      <button class="btn1" onclick="pops()">Close</button>  
+    </div>
+    <div class="popinstructions", id="popinstructions2">
+      <h3>Uploading. Please wait.</h3>
+    </div></div>
+</body>
