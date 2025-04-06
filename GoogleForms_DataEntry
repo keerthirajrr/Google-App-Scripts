@@ -1,0 +1,46 @@
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('upload');
+}
+
+function processExcelData(formData) {
+  try {
+    var data = Utilities.newBlob(formData).getDataAsString();
+    var rows = Utilities.parseCsv(data); // Let's remove the delimiter argument, allowing automatic detection of delimiter
+
+   var formURL = "https://docs.google.com/forms/d/{FormID}/formResponse"; // Replace [formid] with the actual Form ID
+
+    var headers = rows[0].map(header => header.trim()); // Trim the headers to remove any leading/trailing spaces
+
+    var empNameIndex = headers.indexOf("Emp_Name");
+    var empIDIndex = headers.indexOf("Emp_ID");
+    var designationIndex = headers.indexOf("Designation");
+    var teamIndex = headers.indexOf("Team");
+
+    for (var i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+      var empid = rows[i][empIDIndex].trim();
+      var empname = rows[i][empNameIndex].trim();
+      var designation = rows[i][designationIndex].trim();
+      var team = rows[i][teamIndex].trim();
+
+      var formData = {
+        "entry.1710004207": empid,
+        "entry.261210370": empname,
+        "entry.630241216": designation,
+        "entry.2133663420": team
+      };
+
+      var options = {
+        "method": "post",
+        "payload": formData
+      };
+
+      var response = UrlFetchApp.fetch(formURL, options);
+      Logger.log(response.getContentText()); // Log the response for debugging purposes
+    }
+
+    return "Success"; // Return success status
+  } catch (error) {
+    Logger.log(error);
+    return "Failed"; // Return failure status
+  }
+}
