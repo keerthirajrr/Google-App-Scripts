@@ -2,27 +2,30 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('upload');
 }
 
-function processExcelData(formData) {
+function processExcelData(fileBlob) {
   try {
-    var data = Utilities.newBlob(formData).getDataAsString();
-    var rows = Utilities.parseCsv(data); // Let's remove the delimiter argument, allowing automatic detection of delimiter
+    var data = Utilities.newBlob(fileBlob).getDataAsString();
+    var rows = Utilities.parseCsv(data);
 
-   var formURL = "https://docs.google.com/forms/d/{FormID}/formResponse"; // Replace [formid] with the actual Form ID
+    var formURL = "https://docs.google.com/forms/d/[FormId]/formResponse"; // Replace [FormId]
 
-    var headers = rows[0].map(header => header.trim()); // Trim the headers to remove any leading/trailing spaces
-
+    var headers = rows[0].map(h => h.trim());
     var empNameIndex = headers.indexOf("Emp_Name");
     var empIDIndex = headers.indexOf("Emp_ID");
     var designationIndex = headers.indexOf("Designation");
     var teamIndex = headers.indexOf("Team");
 
-    for (var i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+    if ([empNameIndex, empIDIndex, designationIndex, teamIndex].includes(-1)) {
+      throw new Error("Missing one or more required headers.");
+    }
+
+    for (var i = 1; i < rows.length; i++) {
       var empid = rows[i][empIDIndex].trim();
       var empname = rows[i][empNameIndex].trim();
       var designation = rows[i][designationIndex].trim();
       var team = rows[i][teamIndex].trim();
 
-      var formData = {
+      var formPayload = {
         "entry.1710004207": empid,
         "entry.261210370": empname,
         "entry.630241216": designation,
@@ -31,16 +34,18 @@ function processExcelData(formData) {
 
       var options = {
         "method": "post",
-        "payload": formData
+        "payload": formPayload
       };
 
       var response = UrlFetchApp.fetch(formURL, options);
-      Logger.log(response.getContentText()); // Log the response for debugging purposes
+      Logger.log("Response for row " + i + ": " + response.getResponseCode());
+
+      Utilities.sleep(500); // Delay to avoid form rate limiting
     }
 
-    return "Success"; // Return success status
+    return "Success";
   } catch (error) {
-    Logger.log(error);
-    return "Failed"; // Return failure status
+    Logger.log("Error: " + error.toString());
+    return "Failed";
   }
 }
